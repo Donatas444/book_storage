@@ -15,7 +15,7 @@ public class ScienceJournalService {
     @Autowired
     ScienceJournalRepository scienceJournalRepository;
 
-    public void addJournal(ScienceJournal journal) throws Exception {
+    public void addJournal(ScienceJournal journal) throws IllegalArgumentException {
         if (journal.getScienceIndex() <= 10) {
             ScienceJournal sJournal = new ScienceJournal();
             sJournal.setBookName(journal.getBookName());
@@ -25,13 +25,13 @@ public class ScienceJournalService {
             sJournal.setScienceIndex(journal.getScienceIndex());
             sJournal.setBarcode(journal.getBarcode());
             scienceJournalRepository.save(sJournal);
-        } else throw new Exception("Science index can not be bigger than 10");
+        } else throw new IllegalArgumentException("Science index can not be bigger than 10");
     }
 
-    public void validateBarcodeAndAddJournal(ScienceJournal journal) throws Exception {
+    public void validateBarcodeAndAddJournal(ScienceJournal journal) throws IllegalArgumentException {
         if (journal.getBarcode().length() == 12 || journal.getBarcode().length() == 8) {
             addJournal(journal);
-        } else throw new Exception("Barcode length must be 8, or 12 chars/symbols");
+        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
     }
 
     public ScienceJournal findByBarcode(String barcode) {
@@ -53,6 +53,8 @@ public class ScienceJournalService {
                 journal.setBarcode(text);
                 scienceJournalRepository.save(journal);
                 break;
+            default:
+                throw new IllegalArgumentException("Wrong field name.");
         }
     }
 

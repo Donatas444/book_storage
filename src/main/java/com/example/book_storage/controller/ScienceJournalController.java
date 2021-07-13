@@ -13,7 +13,7 @@ public class ScienceJournalController {
     ScienceJournalService scienceJournalService;
 
     @PostMapping("/journal")
-    public void addBook(@RequestBody ScienceJournal journal) throws Exception {
+    public void addBook(@RequestBody ScienceJournal journal) {
         scienceJournalService.validateBarcodeAndAddJournal(journal);
     }
 

@@ -15,7 +15,7 @@ public class RegularBookService {
     @Autowired
     RegularBookRepository regularBookRepository;
 
-    public void addBook(RegularBook book) throws Exception {
+    public void addBook(RegularBook book) throws IllegalArgumentException {
         if (book.getBarcode().length() == 12 || book.getBarcode().length() == 8) {
             RegularBook newBook = new RegularBook();
             newBook.setBookName(book.getBookName());
@@ -24,7 +24,7 @@ public class RegularBookService {
             newBook.setQuantity(book.getQuantity());
             newBook.setBarcode(book.getBarcode());
             regularBookRepository.save(newBook);
-        } else throw new Exception("Barcode length must be 8, or 12 chars/symbols");
+        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
     }
 
     public RegularBook findByBarcode(String barcode) throws NullPointerException {
@@ -46,6 +46,8 @@ public class RegularBookService {
                 book.setBarcode(text);
                 regularBookRepository.save(book);
                 break;
+            default:
+                throw new IllegalArgumentException("Wrong field name");
         }
     }
 

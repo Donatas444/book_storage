@@ -1,6 +1,8 @@
 package com.example.book_storage.controller;
 
 import com.example.book_storage.service.BarcodeService;
+import net.sourceforge.barbecue.BarcodeException;
+import net.sourceforge.barbecue.output.OutputException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,7 +19,7 @@ public class BarcodeController {
     BarcodeService barcodeService;
 
     @GetMapping(value = "/print/{barcode}", produces = MediaType.IMAGE_PNG_VALUE)
-    public ResponseEntity<BufferedImage> printBarcode(@PathVariable("barcode") String barcode) throws Exception {
+    public ResponseEntity<BufferedImage> printBarcode(@PathVariable("barcode") String barcode) throws BarcodeException, OutputException {
         return okResponse(barcodeService.generateBarcodeImage(barcode));
     }
 

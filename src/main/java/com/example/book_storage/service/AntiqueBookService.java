@@ -43,10 +43,10 @@ public class AntiqueBookService {
         }
     }
 
-    public void validateBarcodeAndAddBook(AntiqueBook book) throws Exception {
+    public void validateBarcodeAndAddBook(AntiqueBook book) throws IllegalArgumentException {
         if (book.getBarcode().length() == 12 || book.getBarcode().length() == 8) {
             addAntiqueOrRegularBook(book);
-        } else throw new Exception("Barcode length must be 8, or 12 chars/symbols");
+        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
     }
 
     public AntiqueBook findByBarcode(String barcode) throws NullPointerException {
@@ -68,6 +68,8 @@ public class AntiqueBookService {
                 book.setBarcode(text);
                 antiqueBookRepository.save(book);
                 break;
+            default:
+                throw new IllegalArgumentException("Wrong field name.");
         }
     }
 

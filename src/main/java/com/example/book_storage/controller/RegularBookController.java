@@ -13,7 +13,7 @@ public class RegularBookController {
     RegularBookService regularBookService;
 
     @PostMapping("/book")
-    public void addBook(@RequestBody RegularBook book) throws Exception {
+    public void addBook(@RequestBody RegularBook book) {
         regularBookService.addBook(book);
     }
 

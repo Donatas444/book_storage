@@ -14,7 +14,7 @@ public class AntiqueBookController {
     AntiqueBookService antiqueBookService;
 
     @PostMapping("/abook")
-    public void addBook(@RequestBody AntiqueBook book) throws Exception {
+    public void addBook(@RequestBody AntiqueBook book) {
         antiqueBookService.validateBarcodeAndAddBook(book);
     }
 
