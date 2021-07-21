@@ -14,7 +14,7 @@ public class ScienceJournalController {
 
     @PostMapping("/journal")
     public void addBook(@RequestBody ScienceJournal journal) {
-        scienceJournalService.validateBarcodeAndAddJournal(journal);
+        scienceJournalService.addJournal(journal);
     }
 
     @GetMapping("/journal/{barcode}")

@@ -20,15 +20,19 @@ public class AntiqueBookService {
     AntiqueBookRepository antiqueBookRepository;
     @Autowired
     RegularBookRepository regularBookRepository;
+    @Autowired
+    AllBooksService allBooksService;
 
     public void addAntiqueOrRegularBook(AntiqueBook book) {
-        LocalDate limit = LocalDate.of(1900, 01, 01);
+        LocalDate limit = LocalDate.of(1900, 1, 1);
         if (limit.compareTo(book.getPublishingYear()) >= 0) {
             AntiqueBook newBook = new AntiqueBook();
             newBook.setBookName(book.getBookName());
             newBook.setAuthor(book.getAuthor());
+            allBooksService.priceValidation(book.getPrice());
             newBook.setPrice(book.getPrice());
             newBook.setQuantity(book.getQuantity());
+            allBooksService.validateBarcode(book.getBarcode());
             newBook.setBarcode(book.getBarcode());
             newBook.setPublishingYear(book.getPublishingYear());
             antiqueBookRepository.save(newBook);
@@ -41,12 +45,6 @@ public class AntiqueBookService {
             regularBook.setBarcode(book.getBarcode());
             regularBookRepository.save(regularBook);
         }
-    }
-
-    public void validateBarcodeAndAddBook(AntiqueBook book) throws IllegalArgumentException {
-        if (book.getBarcode().length() == 12 || book.getBarcode().length() == 8) {
-            addAntiqueOrRegularBook(book);
-        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
     }
 
     public AntiqueBook findByBarcode(String barcode) throws NullPointerException {

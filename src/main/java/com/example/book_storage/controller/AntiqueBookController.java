@@ -15,7 +15,7 @@ public class AntiqueBookController {
 
     @PostMapping("/abook")
     public void addBook(@RequestBody AntiqueBook book) {
-        antiqueBookService.validateBarcodeAndAddBook(book);
+        antiqueBookService.addAntiqueOrRegularBook(book);
     }
 
     @GetMapping("/abook/{barcode}")

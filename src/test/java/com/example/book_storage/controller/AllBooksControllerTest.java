@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ContextConfiguration(classes = {AllBooksController.class})
 @ExtendWith(SpringExtension.class)
-public class AllBooksControllerTest {
+class AllBooksControllerTest {
     @Autowired
     private AllBooksController allBooksController;
 
@@ -27,8 +27,8 @@ public class AllBooksControllerTest {
     private AllBooksService allBooksService;
 
     @Test
-    public void testGetAllStock() throws Exception {
-        when(this.allBooksService.allBooksByQuantity()).thenReturn(new ArrayList<Object>());
+    void testGetAllStock() throws Exception {
+        when(this.allBooksService.allBooksByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/all");
         MockMvcBuilders.standaloneSetup(this.allBooksController)
                 .build()
@@ -39,8 +39,8 @@ public class AllBooksControllerTest {
     }
 
     @Test
-    public void testGetAllStock2() throws Exception {
-        when(this.allBooksService.allBooksByQuantity()).thenReturn(new ArrayList<Object>());
+    void testGetAllStock2() throws Exception {
+        when(this.allBooksService.allBooksByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/all");
         MockMvcBuilders.standaloneSetup(this.allBooksController)
                 .build()

@@ -14,24 +14,22 @@ import java.util.stream.Collectors;
 public class ScienceJournalService {
     @Autowired
     ScienceJournalRepository scienceJournalRepository;
+    @Autowired
+    AllBooksService allBooksService;
 
     public void addJournal(ScienceJournal journal) throws IllegalArgumentException {
         if (journal.getScienceIndex() <= 10) {
             ScienceJournal sJournal = new ScienceJournal();
             sJournal.setBookName(journal.getBookName());
             sJournal.setAuthor(journal.getAuthor());
+            allBooksService.priceValidation(journal.getPrice());
             sJournal.setPrice(journal.getPrice());
             sJournal.setQuantity(journal.getQuantity());
             sJournal.setScienceIndex(journal.getScienceIndex());
+            allBooksService.validateBarcode(journal.getBarcode());
             sJournal.setBarcode(journal.getBarcode());
             scienceJournalRepository.save(sJournal);
         } else throw new IllegalArgumentException("Science index can not be bigger than 10");
-    }
-
-    public void validateBarcodeAndAddJournal(ScienceJournal journal) throws IllegalArgumentException {
-        if (journal.getBarcode().length() == 12 || journal.getBarcode().length() == 8) {
-            addJournal(journal);
-        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
     }
 
     public ScienceJournal findByBarcode(String barcode) {

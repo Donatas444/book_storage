@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyDouble;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,9 +27,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {AntiqueBookService.class})
+@ContextConfiguration(classes = {AntiqueBookService.class, AllBooksService.class})
 @ExtendWith(SpringExtension.class)
-public class AntiqueBookServiceTest {
+class AntiqueBookServiceTest {
+    @MockBean
+    private AllBooksService allBooksService;
+
     @MockBean
     private AntiqueBookRepository antiqueBookRepository;
 
@@ -40,7 +43,7 @@ public class AntiqueBookServiceTest {
     private RegularBookRepository regularBookRepository;
 
     @Test
-    public void testAddAntiqueOrRegularBook() {
+    void testAddAntiqueOrRegularBook() {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -57,7 +60,7 @@ public class AntiqueBookServiceTest {
     }
 
     @Test
-    public void testAddAntiqueOrRegularBook2() {
+    void testAddAntiqueOrRegularBook2() throws IllegalArgumentException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -76,30 +79,19 @@ public class AntiqueBookServiceTest {
         antiqueBook.setQuantity(1);
         antiqueBook.setAuthor("JaneDoe");
         when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook);
+        doNothing().when(this.allBooksService).validateBarcode(anyString());
+        doNothing().when(this.allBooksService).priceValidation(anyDouble());
 
         AntiqueBook antiqueBook1 = new AntiqueBook();
         antiqueBook1.setPublishingYear(LocalDate.ofYearDay(1, 1));
         this.antiqueBookService.addAntiqueOrRegularBook(antiqueBook1);
         verify(this.antiqueBookRepository).save(any());
+        verify(this.allBooksService).priceValidation(anyDouble());
+        verify(this.allBooksService).validateBarcode(anyString());
     }
 
     @Test
-    public void testValidateBarcodeAndAddBook() throws Exception {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setBarcode("Barcode");
-        assertThrows(Exception.class, () -> this.antiqueBookService.validateBarcodeAndAddBook(antiqueBook));
-    }
-
-    @Test
-    public void testValidateBarcodeAndAddBook2() throws Exception {
-        AntiqueBook antiqueBook = mock(AntiqueBook.class);
-        when(antiqueBook.getBarcode()).thenReturn("foo");
-        assertThrows(Exception.class, () -> this.antiqueBookService.validateBarcodeAndAddBook(antiqueBook));
-        verify(antiqueBook, times(2)).getBarcode();
-    }
-
-    @Test
-    public void testFindByBarcode() throws NullPointerException {
+    void testFindByBarcode() throws NullPointerException {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);
@@ -114,7 +106,7 @@ public class AntiqueBookServiceTest {
     }
 
     @Test
-    public void testEditBookByBarcode() throws NullPointerException {
+    void testEditBookByBarcode() throws NullPointerException {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);
@@ -140,152 +132,7 @@ public class AntiqueBookServiceTest {
     }
 
     @Test
-    public void testEditBookByBarcode2() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-
-        AntiqueBook antiqueBook1 = new AntiqueBook();
-        antiqueBook1.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook1.setPrice(10.0);
-        antiqueBook1.setBookName("Book Name");
-        antiqueBook1.setId(123L);
-        antiqueBook1.setBarcode("Barcode");
-        antiqueBook1.setQuantity(1);
-        antiqueBook1.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook1);
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", 1);
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-        verify(this.antiqueBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode3() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", "Table Column", "Text");
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-    }
-
-    @Test
-    public void testEditBookByBarcode4() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-
-        AntiqueBook antiqueBook1 = new AntiqueBook();
-        antiqueBook1.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook1.setPrice(10.0);
-        antiqueBook1.setBookName("Book Name");
-        antiqueBook1.setId(123L);
-        antiqueBook1.setBarcode("Barcode");
-        antiqueBook1.setQuantity(1);
-        antiqueBook1.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook1);
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", "author", "Text");
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-        verify(this.antiqueBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode5() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-
-        AntiqueBook antiqueBook1 = new AntiqueBook();
-        antiqueBook1.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook1.setPrice(10.0);
-        antiqueBook1.setBookName("Book Name");
-        antiqueBook1.setId(123L);
-        antiqueBook1.setBarcode("Barcode");
-        antiqueBook1.setQuantity(1);
-        antiqueBook1.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook1);
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", "barcode", "Text");
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-        verify(this.antiqueBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode6() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-
-        AntiqueBook antiqueBook1 = new AntiqueBook();
-        antiqueBook1.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook1.setPrice(10.0);
-        antiqueBook1.setBookName("Book Name");
-        antiqueBook1.setId(123L);
-        antiqueBook1.setBarcode("Barcode");
-        antiqueBook1.setQuantity(1);
-        antiqueBook1.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook1);
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", "name", "Text");
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-        verify(this.antiqueBookRepository).save((AntiqueBook) any());
-    }
-
-    @Test
-    public void testEditBookByBarcode7() throws NullPointerException {
-        AntiqueBook antiqueBook = new AntiqueBook();
-        antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook.setPrice(10.0);
-        antiqueBook.setBookName("Book Name");
-        antiqueBook.setId(123L);
-        antiqueBook.setBarcode("Barcode");
-        antiqueBook.setQuantity(1);
-        antiqueBook.setAuthor("JaneDoe");
-
-        AntiqueBook antiqueBook1 = new AntiqueBook();
-        antiqueBook1.setPublishingYear(LocalDate.ofEpochDay(1L));
-        antiqueBook1.setPrice(10.0);
-        antiqueBook1.setBookName("Book Name");
-        antiqueBook1.setId(123L);
-        antiqueBook1.setBarcode("Barcode");
-        antiqueBook1.setQuantity(1);
-        antiqueBook1.setAuthor("JaneDoe");
-        when(this.antiqueBookRepository.save(any())).thenReturn(antiqueBook1);
-        when(this.antiqueBookRepository.findByBarcode(anyString())).thenReturn(antiqueBook);
-        this.antiqueBookService.editBookByBarcode("Barcode", LocalDate.ofEpochDay(1L));
-        verify(this.antiqueBookRepository).findByBarcode(anyString());
-        verify(this.antiqueBookRepository).save(any());
-    }
-
-    @Test
-    public void testCalculateTotalPrice() throws NullPointerException {
+    void testCalculateTotalPrice() throws NullPointerException {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);
@@ -300,20 +147,20 @@ public class AntiqueBookServiceTest {
     }
 
     @Test
-    public void testYearToInt() {
+    void testYearToInt() {
         assertEquals(51, this.antiqueBookService.yearToInt(LocalDate.ofEpochDay(1L)));
         assertEquals(2022, this.antiqueBookService.yearToInt(LocalDate.ofYearDay(-1, 1)));
     }
 
     @Test
-    public void testAllBarcodesByQuantity() throws NullPointerException {
-        when(this.antiqueBookRepository.findAll()).thenReturn(new ArrayList<AntiqueBook>());
+    void testAllBarcodesByQuantity() throws NullPointerException {
+        when(this.antiqueBookRepository.findAll()).thenReturn(new ArrayList<>());
         assertTrue(this.antiqueBookService.allBarcodesByQuantity().isEmpty());
         verify(this.antiqueBookRepository).findAll();
     }
 
     @Test
-    public void testAllBarcodesByQuantity2() throws NullPointerException {
+    void testAllBarcodesByQuantity2() throws NullPointerException {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);
@@ -333,7 +180,7 @@ public class AntiqueBookServiceTest {
     }
 
     @Test
-    public void testAllBarcodesByQuantity3() throws NullPointerException {
+    void testAllBarcodesByQuantity3() throws NullPointerException {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);

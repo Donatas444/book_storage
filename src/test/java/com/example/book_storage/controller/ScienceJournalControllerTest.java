@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ContextConfiguration(classes = {ScienceJournalController.class})
 @ExtendWith(SpringExtension.class)
-public class ScienceJournalControllerTest {
+class ScienceJournalControllerTest {
     @Autowired
     private ScienceJournalController scienceJournalController;
 
@@ -34,8 +34,8 @@ public class ScienceJournalControllerTest {
     private ScienceJournalService scienceJournalService;
 
     @Test
-    public void testAddBook() throws Exception {
-        doNothing().when(this.scienceJournalService).validateBarcodeAndAddJournal(any());
+    void testAddBook() throws Exception {
+        doNothing().when(this.scienceJournalService).addJournal(any());
 
         ScienceJournal scienceJournal = new ScienceJournal();
         scienceJournal.setScienceIndex(1);
@@ -56,7 +56,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testCalculateTotalPriceByBarcode() throws Exception {
+    void testCalculateTotalPriceByBarcode() throws Exception {
         when(this.scienceJournalService.calculateTotalPrice(anyString())).thenReturn(10.0);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/journals/price/{barcode}", "Barcode");
         MockMvcBuilders.standaloneSetup(this.scienceJournalController)
@@ -68,7 +68,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testCalculateTotalPriceByBarcode2() throws Exception {
+    void testCalculateTotalPriceByBarcode2() throws Exception {
         when(this.scienceJournalService.calculateTotalPrice(anyString())).thenReturn(10.0);
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/journals/price/{barcode}", "Barcode");
         getResult.contentType("Not all who wander are lost");
@@ -81,7 +81,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode() throws Exception {
+    void testEditBookByBarcode() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/journal/{barcode}/price/{value}", 10.0,
                 "Barcode");
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.scienceJournalController)
@@ -91,7 +91,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode2() throws Exception {
+    void testEditBookByBarcode2() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/journal/{barcode}/quantity/{value}", 42,
                 "Barcode");
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.scienceJournalController)
@@ -101,7 +101,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode3() throws Exception {
+    void testEditBookByBarcode3() throws Exception {
         doNothing().when(this.scienceJournalService).editJournalByBarcode(anyString(), anyString(), anyString());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/journal/{barcode}/{column}/{value}",
                 "Column", "42", "Barcode");
@@ -112,7 +112,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode4() throws Exception {
+    void testEditBookByBarcode4() throws Exception {
         doNothing().when(this.scienceJournalService).editJournalByBarcode(anyString(), anyString(), anyString());
         MockHttpServletRequestBuilder putResult = MockMvcRequestBuilders.put("/journal/{barcode}/{column}/{value}",
                 "Column", "42", "Barcode");
@@ -124,7 +124,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testFindBookByBarcode() throws Exception {
+    void testFindBookByBarcode() throws Exception {
         ScienceJournal scienceJournal = new ScienceJournal();
         scienceJournal.setScienceIndex(1);
         scienceJournal.setPrice(10.0);
@@ -147,7 +147,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testGetAllBarcodesByQuantity() throws Exception {
+    void testGetAllBarcodesByQuantity() throws Exception {
         when(this.scienceJournalService.allBarcodesByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/sjbarcodes");
         MockMvcBuilders.standaloneSetup(this.scienceJournalController)
@@ -159,7 +159,7 @@ public class ScienceJournalControllerTest {
     }
 
     @Test
-    public void testGetAllBarcodesByQuantity2() throws Exception {
+    void testGetAllBarcodesByQuantity2() throws Exception {
         when(this.scienceJournalService.allBarcodesByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/sjbarcodes");
         getResult.contentType("Not all who wander are lost");

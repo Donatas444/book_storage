@@ -14,17 +14,19 @@ import java.util.stream.Collectors;
 public class RegularBookService {
     @Autowired
     RegularBookRepository regularBookRepository;
+    @Autowired
+    AllBooksService allBooksService;
 
-    public void addBook(RegularBook book) throws IllegalArgumentException {
-        if (book.getBarcode().length() == 12 || book.getBarcode().length() == 8) {
-            RegularBook newBook = new RegularBook();
-            newBook.setBookName(book.getBookName());
-            newBook.setAuthor(book.getAuthor());
-            newBook.setPrice(book.getPrice());
-            newBook.setQuantity(book.getQuantity());
-            newBook.setBarcode(book.getBarcode());
-            regularBookRepository.save(newBook);
-        } else throw new IllegalArgumentException("Barcode length must be 8, or 12 chars/symbols");
+    public void addBook(RegularBook book) {
+        RegularBook newBook = new RegularBook();
+        newBook.setBookName(book.getBookName());
+        newBook.setAuthor(book.getAuthor());
+        allBooksService.priceValidation(book.getPrice());
+        newBook.setPrice(book.getPrice());
+        newBook.setQuantity(book.getQuantity());
+        allBooksService.validateBarcode(book.getBarcode());
+        newBook.setBarcode(book.getBarcode());
+        regularBookRepository.save(newBook);
     }
 
     public RegularBook findByBarcode(String barcode) throws NullPointerException {

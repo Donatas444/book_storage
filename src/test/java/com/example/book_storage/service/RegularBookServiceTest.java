@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.anyDouble;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,9 +26,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@ContextConfiguration(classes = {RegularBookService.class})
+@ContextConfiguration(classes = {RegularBookService.class, AllBooksService.class})
 @ExtendWith(SpringExtension.class)
-public class RegularBookServiceTest {
+class RegularBookServiceTest {
+    @MockBean
+    private AllBooksService allBooksService;
+
     @MockBean
     private RegularBookRepository regularBookRepository;
 
@@ -34,22 +39,25 @@ public class RegularBookServiceTest {
     private RegularBookService regularBookService;
 
     @Test
-    public void testAddBook() throws Exception {
+    void testAddBook() throws IllegalArgumentException {
         RegularBook regularBook = new RegularBook();
+        regularBook.setPrice(10.0);
+        regularBook.setBookName("Book Name");
+        regularBook.setId(123L);
         regularBook.setBarcode("Barcode");
-        assertThrows(Exception.class, () -> this.regularBookService.addBook(regularBook));
+        regularBook.setQuantity(1);
+        regularBook.setAuthor("JaneDoe");
+        when(this.regularBookRepository.save(any())).thenReturn(regularBook);
+        doNothing().when(this.allBooksService).validateBarcode(anyString());
+        doNothing().when(this.allBooksService).priceValidation(anyDouble());
+        this.regularBookService.addBook(new RegularBook());
+        verify(this.regularBookRepository).save(any());
+        verify(this.allBooksService).priceValidation(anyDouble());
+        verify(this.allBooksService).validateBarcode(anyString());
     }
 
     @Test
-    public void testAddBook2() throws Exception {
-        RegularBook regularBook = mock(RegularBook.class);
-        when(regularBook.getBarcode()).thenReturn("foo");
-        assertThrows(Exception.class, () -> this.regularBookService.addBook(regularBook));
-        verify(regularBook, times(2)).getBarcode();
-    }
-
-    @Test
-    public void testFindByBarcode() throws NullPointerException {
+    void testFindByBarcode() throws NullPointerException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -63,7 +71,7 @@ public class RegularBookServiceTest {
     }
 
     @Test
-    public void testEditBookByBarcode() throws NullPointerException {
+    void testEditBookByBarcode() throws NullPointerException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -87,117 +95,7 @@ public class RegularBookServiceTest {
     }
 
     @Test
-    public void testEditBookByBarcode2() throws NullPointerException {
-        RegularBook regularBook = new RegularBook();
-        regularBook.setPrice(10.0);
-        regularBook.setBookName("Book Name");
-        regularBook.setId(123L);
-        regularBook.setBarcode("Barcode");
-        regularBook.setQuantity(1);
-        regularBook.setAuthor("JaneDoe");
-
-        RegularBook regularBook1 = new RegularBook();
-        regularBook1.setPrice(10.0);
-        regularBook1.setBookName("Book Name");
-        regularBook1.setId(123L);
-        regularBook1.setBarcode("Barcode");
-        regularBook1.setQuantity(1);
-        regularBook1.setAuthor("JaneDoe");
-        when(this.regularBookRepository.save(any())).thenReturn(regularBook1);
-        when(this.regularBookRepository.findByBarcode(anyString())).thenReturn(regularBook);
-        this.regularBookService.editBookByBarcode("Barcode", 1);
-        verify(this.regularBookRepository).findByBarcode(anyString());
-        verify(this.regularBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode3() throws NullPointerException {
-        RegularBook regularBook = new RegularBook();
-        regularBook.setPrice(10.0);
-        regularBook.setBookName("Book Name");
-        regularBook.setId(123L);
-        regularBook.setBarcode("Barcode");
-        regularBook.setQuantity(1);
-        regularBook.setAuthor("JaneDoe");
-        when(this.regularBookRepository.findByBarcode(anyString())).thenReturn(regularBook);
-        this.regularBookService.editBookByBarcode("Barcode", "Table Column", "Text");
-        verify(this.regularBookRepository).findByBarcode(anyString());
-    }
-
-    @Test
-    public void testEditBookByBarcode4() throws NullPointerException {
-        RegularBook regularBook = new RegularBook();
-        regularBook.setPrice(10.0);
-        regularBook.setBookName("Book Name");
-        regularBook.setId(123L);
-        regularBook.setBarcode("Barcode");
-        regularBook.setQuantity(1);
-        regularBook.setAuthor("JaneDoe");
-
-        RegularBook regularBook1 = new RegularBook();
-        regularBook1.setPrice(10.0);
-        regularBook1.setBookName("Book Name");
-        regularBook1.setId(123L);
-        regularBook1.setBarcode("Barcode");
-        regularBook1.setQuantity(1);
-        regularBook1.setAuthor("JaneDoe");
-        when(this.regularBookRepository.save(any())).thenReturn(regularBook1);
-        when(this.regularBookRepository.findByBarcode(anyString())).thenReturn(regularBook);
-        this.regularBookService.editBookByBarcode("Barcode", "author", "Text");
-        verify(this.regularBookRepository).findByBarcode(anyString());
-        verify(this.regularBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode5() throws NullPointerException {
-        RegularBook regularBook = new RegularBook();
-        regularBook.setPrice(10.0);
-        regularBook.setBookName("Book Name");
-        regularBook.setId(123L);
-        regularBook.setBarcode("Barcode");
-        regularBook.setQuantity(1);
-        regularBook.setAuthor("JaneDoe");
-
-        RegularBook regularBook1 = new RegularBook();
-        regularBook1.setPrice(10.0);
-        regularBook1.setBookName("Book Name");
-        regularBook1.setId(123L);
-        regularBook1.setBarcode("Barcode");
-        regularBook1.setQuantity(1);
-        regularBook1.setAuthor("JaneDoe");
-        when(this.regularBookRepository.save(any())).thenReturn(regularBook1);
-        when(this.regularBookRepository.findByBarcode(anyString())).thenReturn(regularBook);
-        this.regularBookService.editBookByBarcode("Barcode", "barcode", "Text");
-        verify(this.regularBookRepository).findByBarcode(anyString());
-        verify(this.regularBookRepository).save(any());
-    }
-
-    @Test
-    public void testEditBookByBarcode6() throws NullPointerException {
-        RegularBook regularBook = new RegularBook();
-        regularBook.setPrice(10.0);
-        regularBook.setBookName("Book Name");
-        regularBook.setId(123L);
-        regularBook.setBarcode("Barcode");
-        regularBook.setQuantity(1);
-        regularBook.setAuthor("JaneDoe");
-
-        RegularBook regularBook1 = new RegularBook();
-        regularBook1.setPrice(10.0);
-        regularBook1.setBookName("Book Name");
-        regularBook1.setId(123L);
-        regularBook1.setBarcode("Barcode");
-        regularBook1.setQuantity(1);
-        regularBook1.setAuthor("JaneDoe");
-        when(this.regularBookRepository.save(any())).thenReturn(regularBook1);
-        when(this.regularBookRepository.findByBarcode(anyString())).thenReturn(regularBook);
-        this.regularBookService.editBookByBarcode("Barcode", "name", "Text");
-        verify(this.regularBookRepository).findByBarcode(anyString());
-        verify(this.regularBookRepository).save(any());
-    }
-
-    @Test
-    public void testCalculateTotalPrice() throws NullPointerException {
+    void testCalculateTotalPrice() throws NullPointerException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -211,14 +109,14 @@ public class RegularBookServiceTest {
     }
 
     @Test
-    public void testAllBarcodesByQuantity() throws NullPointerException {
+    void testAllBarcodesByQuantity() throws NullPointerException {
         when(this.regularBookRepository.findAll()).thenReturn(new ArrayList<>());
         assertTrue(this.regularBookService.allBarcodesByQuantity().isEmpty());
         verify(this.regularBookRepository).findAll();
     }
 
     @Test
-    public void testAllBarcodesByQuantity2() throws NullPointerException {
+    void testAllBarcodesByQuantity2() throws NullPointerException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");
@@ -237,7 +135,7 @@ public class RegularBookServiceTest {
     }
 
     @Test
-    public void testAllBarcodesByQuantity3() throws NullPointerException {
+    void testAllBarcodesByQuantity3() throws NullPointerException {
         RegularBook regularBook = new RegularBook();
         regularBook.setPrice(10.0);
         regularBook.setBookName("Book Name");

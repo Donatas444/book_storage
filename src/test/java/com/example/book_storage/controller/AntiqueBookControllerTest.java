@@ -27,7 +27,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ContextConfiguration(classes = {AntiqueBookController.class})
 @ExtendWith(SpringExtension.class)
-public class AntiqueBookControllerTest {
+class AntiqueBookControllerTest {
     @Autowired
     private AntiqueBookController antiqueBookController;
 
@@ -35,8 +35,8 @@ public class AntiqueBookControllerTest {
     private AntiqueBookService antiqueBookService;
 
     @Test
-    public void testAddBook() throws Exception {
-        doNothing().when(this.antiqueBookService).validateBarcodeAndAddBook(any());
+    void testAddBook() throws Exception {
+        doNothing().when(this.antiqueBookService).addAntiqueOrRegularBook(any());
 
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(null);
@@ -57,7 +57,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode3() throws Exception {
+    void testEditBookByBarcode3() throws Exception {
         doNothing().when(this.antiqueBookService).editBookByBarcode(anyString(), anyString(), anyString());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/abook/{barcode}/{column}/{value}",
                 "Column", "42", "Barcode");
@@ -68,7 +68,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode4() throws Exception {
+    void testEditBookByBarcode4() throws Exception {
         doNothing().when(this.antiqueBookService).editBookByBarcode(anyString(), anyString(), anyString());
         MockHttpServletRequestBuilder putResult = MockMvcRequestBuilders.put("/abook/{barcode}/{column}/{value}", "Column",
                 "42", "Barcode");
@@ -80,7 +80,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testCalculateTotalPriceByBarcode() throws Exception {
+    void testCalculateTotalPriceByBarcode() throws Exception {
         when(this.antiqueBookService.calculateTotalPrice(anyString())).thenReturn(10.0);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/abooks/price/{barcode}", "Barcode");
         MockMvcBuilders.standaloneSetup(this.antiqueBookController)
@@ -92,7 +92,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testCalculateTotalPriceByBarcode2() throws Exception {
+    void testCalculateTotalPriceByBarcode2() throws Exception {
         when(this.antiqueBookService.calculateTotalPrice(anyString())).thenReturn(10.0);
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/abooks/price/{barcode}", "Barcode");
         getResult.contentType("Not all who wander are lost");
@@ -105,7 +105,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode() throws Exception {
+    void testEditBookByBarcode() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/abook/{barcode}/price/{value}", 10.0,
                 "Barcode");
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.antiqueBookController)
@@ -115,7 +115,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode2() throws Exception {
+    void testEditBookByBarcode2() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/abook/{barcode}/quantity/{value}", 42,
                 "Barcode");
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.antiqueBookController)
@@ -125,7 +125,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testEditBookByBarcode5() throws Exception {
+    void testEditBookByBarcode5() throws Exception {
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/abook/{barcode}/year/*", "Barcode");
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.antiqueBookController)
                 .build()
@@ -134,7 +134,7 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testFindBookByBarcode() throws Exception {
+    void testFindBookByBarcode() throws Exception {
         AntiqueBook antiqueBook = new AntiqueBook();
         antiqueBook.setPublishingYear(LocalDate.ofEpochDay(1L));
         antiqueBook.setPrice(10.0);
@@ -157,8 +157,8 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testGetAllBarcodesByQuantity() throws Exception {
-        when(this.antiqueBookService.allBarcodesByQuantity()).thenReturn(new ArrayList<String>());
+    void testGetAllBarcodesByQuantity() throws Exception {
+        when(this.antiqueBookService.allBarcodesByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/abarcodes");
         MockMvcBuilders.standaloneSetup(this.antiqueBookController)
                 .build()
@@ -169,8 +169,8 @@ public class AntiqueBookControllerTest {
     }
 
     @Test
-    public void testGetAllBarcodesByQuantity2() throws Exception {
-        when(this.antiqueBookService.allBarcodesByQuantity()).thenReturn(new ArrayList<String>());
+    void testGetAllBarcodesByQuantity2() throws Exception {
+        when(this.antiqueBookService.allBarcodesByQuantity()).thenReturn(new ArrayList<>());
         MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/abarcodes");
         getResult.contentType("Not all who wander are lost");
         MockMvcBuilders.standaloneSetup(this.antiqueBookController)
